@@ -1,0 +1,68 @@
+package com.af.vrs.service;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
+import com.af.vrs.customer.application.CustomerApplicationService;
+import com.af.vrs.entity.Customer;
+import com.af.vrs.repository.CustomerRepository;
+import com.af.vrs.security.Role;
+
+import jakarta.persistence.EntityNotFoundException;
+
+@Service
+public class CustomerService implements CustomerApplicationService {
+    @Autowired
+    private CustomerRepository customerRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    public Customer saveCustomer(Customer customer) {
+        if (customer.getPassword() != null && !customer.getPassword().isBlank()) {
+            customer.setPassword(passwordEncoder.encode(customer.getPassword()));
+        }
+        if (customer.getRole() == null) {
+            customer.setRole(Role.CUSTOMER);
+        }
+        return customerRepository.save(customer);
+    }
+
+    public List<Customer> getAllCustomers() {
+        return customerRepository.findAll();
+    }
+
+    public Customer getCustomerById(Long customerId) {
+        return customerRepository.findById(customerId).orElseThrow(() -> new EntityNotFoundException("Customer not found"));
+    }
+
+    public Customer updateCustomer(Long customerId, Customer customerDetails) {
+        Customer customer = getCustomerById(customerId);
+        customer.setFirstName(customerDetails.getFirstName());
+        customer.setLastName(customerDetails.getLastName());
+        customer.setUsername(customerDetails.getUsername());
+        if (customerDetails.getPassword() != null && !customerDetails.getPassword().isBlank()) {
+            customer.setPassword(passwordEncoder.encode(customerDetails.getPassword()));
+        }
+        customer.setEmail(customerDetails.getEmail());
+        customer.setPhoneNumber(customerDetails.getPhoneNumber());
+        customer.setStatus(customerDetails.getStatus());
+        if (customerDetails.getRole() != null) {
+            customer.setRole(customerDetails.getRole());
+        }
+        customer.setPaymentMethod1(customerDetails.getPaymentMethod1());
+        customer.setPaymentMethod2(customerDetails.getPaymentMethod2());
+        customer.setDetailPaymentMethod1(customerDetails.getDetailPaymentMethod1());
+        customer.setDetailPaymentMethod2(customerDetails.getDetailPaymentMethod2());
+        return customerRepository.save(customer);
+    }
+
+    public void deleteCustomer(Long customerId) {
+        Customer customer = getCustomerById(customerId);
+        customerRepository.delete(customer);
+    }
+}
+

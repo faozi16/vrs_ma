@@ -1,0 +1,41 @@
+package com.af.vrs.entity;
+
+import com.af.vrs.security.Role;
+
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+
+@Entity
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@ToString
+public class Customer {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long customerId;
+    private String firstName;
+    private String lastName;
+    private String username;
+    private String password;
+    private String email;
+    private String phoneNumber;
+    private String status;
+    @Enumerated(EnumType.STRING)
+    private Role role;
+    private String paymentMethod1;
+    private String paymentMethod2;
+    private String detailPaymentMethod1;
+    private String detailPaymentMethod2;    
+}
+

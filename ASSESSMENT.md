@@ -398,6 +398,68 @@ Stage D: Full Deployment
 └── Monitoring and fixes
 ```
 
+### 1.6 Phase 1 Baseline (Executed: 2026-03-07)
+
+This section records the approved migration gate before any structural monolith-to-microservices changes.
+
+#### Phase 1 Objective
+- Establish a reproducible baseline for behavior, test health, and API surface.
+- Prevent regressions during modular-monolith and service extraction phases.
+
+#### Completed Activities
+- Verified clean git working tree before phase execution.
+- Executed test baseline from repository root: `./gradlew test`.
+- Captured current API endpoint contract inventory from controller mappings.
+- Linked artifacts for future delta comparison.
+
+#### Baseline Result
+- Test status: `BUILD SUCCESSFUL`.
+- Scope: existing monolith runtime and controller API surface.
+
+#### Baseline Artifacts
+- API and migration baseline snapshot: `docs/migration/phase1-baseline.md`.
+
+#### Exit Criteria For Phase 1
+- Green tests on baseline commit.
+- Frozen endpoint inventory documented.
+- Assessment document updated with migration gate evidence.
+
+#### Entry Criteria For Phase 2
+- Start modular-monolith packaging by domain boundaries.
+- Keep API behavior backward-compatible with the baseline snapshot.
+- Run full regression tests after each domain move.
+
+### 1.7 Phase 2 Modular Monolith (Executed: 2026-03-07)
+
+This section records the first structural code change while preserving monolith deployment and API behavior.
+
+#### Phase 2 Objective
+- Introduce domain application boundaries inside the monolith.
+- Keep all endpoint contracts and request/response behavior backward-compatible.
+
+#### Completed Activities
+- Added domain application interfaces for target microservice boundaries:
+    - `customer` (`CustomerApplicationService`, `PaymentMethodApplicationService`)
+    - `catalog` (`VehicleApplicationService`, `DriverApplicationService`)
+    - `reservation` (`ReservationApplicationService`, `FeedbackApplicationService`)
+    - `billing` (`PaymentApplicationService`)
+- Updated existing service implementations to implement those interfaces.
+- Updated controllers to depend on domain interfaces instead of concrete service classes.
+- Updated controller unit tests to mock domain interfaces.
+
+#### Baseline Compatibility Check
+- Endpoint paths: unchanged.
+- Payload/response mapping: unchanged.
+- Test status after refactor: `BUILD SUCCESSFUL` via `./gradlew test`.
+
+#### Artifacts
+- Phase 1 baseline: `docs/migration/phase1-baseline.md`
+- Phase 2 implementation notes: `docs/migration/phase2-modular-monolith.md`
+
+#### Entry Criteria For Phase 3
+- Introduce explicit internal module facades for cross-domain orchestration.
+- Begin service extraction preparation (starting with Catalog service) with API compatibility checks against Phase 1 baseline.
+
 ---
 
 ## Part 2: Multi-Vehicle Type Support Enhancement
@@ -780,7 +842,7 @@ graph LR
 #### Code Structure Changes
 
 ```
-BEFORE: com.af.carrsvt/
+BEFORE: com.af.vrs/
 ├── controller/
 ├── service/
 ├── entity/

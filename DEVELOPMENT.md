@@ -122,7 +122,7 @@ flowchart LR
 car_reservation_system/
 ├── src/
 │   ├── main/
-│   │   ├── java/com/af/carrsvt/
+│   │   ├── java/com/af/vrs/
 │   │   │   ├── CarReservationApplication.java     # Main entry point
 │   │   │   ├── audit/                             # Audit logging utilities
 │   │   │   ├── constant/                          # Application constants
@@ -139,7 +139,7 @@ car_reservation_system/
 │   │       ├── static/                            # Static assets
 │   │       └── templates/                         # Thymeleaf templates (optional)
 │   └── test/
-│       └── java/com/af/carrsvt/
+│       └── java/com/af/vrs/
 │           ├── integration/                       # Integration tests
 │           └── resources/application.properties   # Test config
 ├── build.gradle                                    # Gradle build configuration
@@ -331,7 +331,7 @@ CREATE TABLE feedback (
 ## Entity Classes & Relationships
 
 ### 1. Customer
-**File**: [src/main/java/com/af/carrsvt/entity/Customer.java](src/main/java/com/af/carrsvt/entity/Customer.java)
+**File**: [src/main/java/com/af/vrs/entity/Customer.java](src/main/java/com/af/vrs/entity/Customer.java)
 
 **Relationships**:
 - One-to-Many: reservation
@@ -340,7 +340,7 @@ CREATE TABLE feedback (
 **Key Fields**: customer_id (PK), first_name, last_name, username, email, phone_number, status
 
 ### 2. Vehicle
-**File**: [src/main/java/com/af/carrsvt/entity/Vehicle.java](src/main/java/com/af/carrsvt/entity/Vehicle.java)
+**File**: [src/main/java/com/af/vrs/entity/Vehicle.java](src/main/java/com/af/vrs/entity/Vehicle.java)
 
 **Relationships**:
 - Many-to-One: driver
@@ -349,7 +349,7 @@ CREATE TABLE feedback (
 **Key Fields**: vehicle_id (PK), driver_id (FK), vehicle_type, license_plate, status
 
 ### 3. Driver
-**File**: [src/main/java/com/af/carrsvt/entity/Driver.java](src/main/java/com/af/carrsvt/entity/Driver.java)
+**File**: [src/main/java/com/af/vrs/entity/Driver.java](src/main/java/com/af/vrs/entity/Driver.java)
 
 **Relationships**:
 - One-to-Many: vehicle
@@ -357,7 +357,7 @@ CREATE TABLE feedback (
 **Key Fields**: driver_id (PK), name, license_number, status, phone_number
 
 ### 4. Reservation
-**File**: [src/main/java/com/af/carrsvt/entity/Reservation.java](src/main/java/com/af/carrsvt/entity/Reservation.java)
+**File**: [src/main/java/com/af/vrs/entity/Reservation.java](src/main/java/com/af/vrs/entity/Reservation.java)
 
 **Relationships**:
 - Many-to-One: customer
@@ -368,7 +368,7 @@ CREATE TABLE feedback (
 **Key Fields**: reservation_id (PK), customer_id (FK), vehicle_id (FK), pickup_time, status
 
 ### 5. Payment
-**File**: [src/main/java/com/af/carrsvt/entity/Payment.java](src/main/java/com/af/carrsvt/entity/Payment.java)
+**File**: [src/main/java/com/af/vrs/entity/Payment.java](src/main/java/com/af/vrs/entity/Payment.java)
 
 **Relationships**:
 - Many-to-One: reservation
@@ -376,7 +376,7 @@ CREATE TABLE feedback (
 **Key Fields**: payment_id (PK), reservation_id (FK), amount, method, status
 
 ### 6. PaymentMethod
-**File**: [src/main/java/com/af/carrsvt/entity/PaymentMethod.java](src/main/java/com/af/carrsvt/entity/PaymentMethod.java)
+**File**: [src/main/java/com/af/vrs/entity/PaymentMethod.java](src/main/java/com/af/vrs/entity/PaymentMethod.java)
 
 **Relationships**:
 - Many-to-One: customer
@@ -384,7 +384,7 @@ CREATE TABLE feedback (
 **Key Fields**: payment_method_id (PK), customer_id (FK), method_type, details, primary_method, created_at
 
 ### 7. Feedback
-**File**: [src/main/java/com/af/carrsvt/entity/Feedback.java](src/main/java/com/af/carrsvt/entity/Feedback.java)
+**File**: [src/main/java/com/af/vrs/entity/Feedback.java](src/main/java/com/af/vrs/entity/Feedback.java)
 
 **Relationships**:
 - Many-to-One: reservation
@@ -517,7 +517,7 @@ spring.jpa.show-sql=true                # Log all SQL queries
 ```
 
 ### Security Configuration
-**File**: [src/main/java/com/af/carrsvt/security/SecurityConfig.java](src/main/java/com/af/carrsvt/security/SecurityConfig.java)
+**File**: [src/main/java/com/af/vrs/security/SecurityConfig.java](src/main/java/com/af/vrs/security/SecurityConfig.java)
 
 - Spring Security enabled
 - CustomerUserDetailsService loads users from database
@@ -616,7 +616,7 @@ mysql -u theuser -pthepassword car_rsvt < init.sql
 ## Testing Strategy
 
 ### Test Structure
-**Directory**: [src/test/java/com/af/carrsvt/](src/test/java/com/af/carrsvt/)
+**Directory**: [src/test/java/com/af/vrs/](src/test/java/com/af/vrs/)
 
 ### Integration Tests
 - **IntegrationTests.java**: Helper class for test environment setup
