@@ -460,6 +460,47 @@ This section records the first structural code change while preserving monolith 
 - Introduce explicit internal module facades for cross-domain orchestration.
 - Begin service extraction preparation (starting with Catalog service) with API compatibility checks against Phase 1 baseline.
 
+### 1.8 Phase 3 Extraction Preparation (Executed: 2026-03-07)
+
+This section records extraction-readiness work after package normalization to `com.af.vrs`.
+
+#### Phase 3 Objective
+- Introduce explicit cross-domain read facades to reduce direct package coupling.
+- Prepare Catalog-first extraction by defining stable in-process contracts that can later be remoted.
+
+#### Completed Activities
+- Added shared facade contracts:
+    - `CustomerReadFacade`
+    - `CatalogReadFacade`
+    - `ReservationReadFacade`
+    - `BillingReadFacade`
+- Added facade adapters per domain using existing repositories:
+    - `customer/facade/CustomerReadFacadeAdapter`
+    - `catalog/facade/CatalogReadFacadeAdapter`
+    - `reservation/facade/ReservationReadFacadeAdapter`
+    - `billing/facade/BillingReadFacadeAdapter`
+- Added shared summary models for facade payload boundaries:
+    - `CustomerSummary`, `VehicleSummary`, `ReservationSummary`
+- Added reservation cross-domain orchestration component:
+    - `ReservationCrossDomainService`
+    - `ReferenceValidationResult`
+- Added billing repository contract methods for extraction-ready lookups:
+    - `existsByReservationId(Long reservationId)`
+    - `findByReservationId(Long reservationId)`
+
+#### Baseline Compatibility Check
+- External REST endpoints: unchanged.
+- Controller request/response shape: unchanged.
+- Deployment mode: still single-process monolith.
+
+#### Artifacts
+- Phase 3 implementation notes: `docs/migration/phase3-extraction-preparation.md`
+
+#### Entry Criteria For Phase 4
+- Use the shared facades as the only cross-domain access path for new logic.
+- Start Catalog service extraction behind `CatalogReadFacade` boundary.
+- Add compatibility adapters (local vs remote) without changing controller contracts.
+
 ---
 
 ## Part 2: Multi-Vehicle Type Support Enhancement
