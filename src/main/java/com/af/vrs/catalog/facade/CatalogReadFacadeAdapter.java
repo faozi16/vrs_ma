@@ -2,6 +2,7 @@ package com.af.vrs.catalog.facade;
 
 import java.util.Optional;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
 import com.af.vrs.repository.VehicleRepository;
@@ -9,6 +10,7 @@ import com.af.vrs.shared.facade.CatalogReadFacade;
 import com.af.vrs.shared.facade.model.VehicleSummary;
 
 @Service
+@ConditionalOnProperty(name = "app.catalog.read.mode", havingValue = "local", matchIfMissing = true)
 public class CatalogReadFacadeAdapter implements CatalogReadFacade {
     private final VehicleRepository vehicleRepository;
 

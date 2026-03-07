@@ -501,6 +501,39 @@ This section records extraction-readiness work after package normalization to `c
 - Start Catalog service extraction behind `CatalogReadFacade` boundary.
 - Add compatibility adapters (local vs remote) without changing controller contracts.
 
+### 1.9 Phase 4 Catalog Boundary Switch (Executed: 2026-03-07)
+
+This section records the first extraction-compatible boundary switch for Catalog access.
+
+#### Phase 4 Objective
+- Keep existing monolith behavior as default while enabling a remote Catalog read path.
+- Ensure Reservation and other consumers continue using `CatalogReadFacade` unchanged.
+
+#### Completed Activities
+- Added remote-ready DTO contract:
+    - `catalog/facade/remote/CatalogVehicleResponse`
+- Added remote facade adapter:
+    - `catalog/facade/RemoteCatalogReadFacadeAdapter`
+    - Uses `RestClient` to resolve `/api/vehicles/{id}` from Catalog base URL.
+- Updated local adapter activation to be mode-based:
+    - `CatalogReadFacadeAdapter` active when `app.catalog.read.mode=local` (default).
+- Added runtime switch properties:
+    - `app.catalog.read.mode` (`local` or `remote`)
+    - `app.catalog.remote.base-url`
+
+#### Baseline Compatibility Check
+- Default mode remains `local`; endpoint behavior unchanged.
+- No controller contract changes required.
+- Migration path to remote Catalog reads now configuration-driven.
+
+#### Artifacts
+- Phase 4 implementation notes: `docs/migration/phase4-catalog-boundary-switch.md`
+
+#### Entry Criteria For Phase 5
+- Stand up independent Catalog service runtime and verify `remote` mode end-to-end.
+- Introduce resilience policies (timeouts/retries/circuit breaker) around remote facade calls.
+- Add contract tests for `CatalogReadFacade` local vs remote parity.
+
 ---
 
 ## Part 2: Multi-Vehicle Type Support Enhancement
