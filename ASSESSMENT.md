@@ -568,6 +568,46 @@ This section records reliability and parity work for remote Catalog facade mode.
 - Add observability metrics for remote call latency/failure counts.
 - Introduce fallback strategy and/or circuit breaker once service split traffic increases.
 
+### 1.11 Phase 6 Remote Observability and Fallback Control (Executed: 2026-03-07)
+
+This section records operational hardening for remote Catalog reads during extraction transition.
+
+#### Phase 6 Objective
+- Improve visibility of remote facade behavior under load/failure.
+- Protect consumers with circuit-open short-circuiting and controlled local fallback.
+
+#### Completed Activities
+- Added Micrometer metrics in remote catalog facade:
+    - latency timer for remote calls
+    - counters for success/failure/short-circuit outcomes
+    - counters for fallback hit/miss and reasons
+- Added in-process circuit breaker policy:
+    - consecutive failure threshold
+    - open duration window
+    - automatic close/reset after open window expires
+- Added local fallback service used by remote mode when enabled:
+    - `LocalCatalogFallbackReadService`
+- Added new configuration controls:
+    - `app.catalog.remote.circuit.failure-threshold`
+    - `app.catalog.remote.circuit.open-ms`
+    - `app.catalog.remote.fallback-to-local`
+- Added/extended tests for remote behavior:
+    - mapping and retry behavior
+    - circuit-open + fallback behavior
+
+#### Baseline Compatibility Check
+- Default app mode remains local and backward-compatible.
+- Remote mode now has bounded failure behavior and explicit fallback policy.
+- External API contract remains unchanged.
+
+#### Artifacts
+- Phase 6 implementation notes: `docs/migration/phase6-remote-observability-and-fallback.md`
+
+#### Entry Criteria For Phase 7
+- Validate remote mode against independently running Catalog service in integration environment.
+- Add dashboarding/alerts on new metric series.
+- Decide long-term fallback policy (keep, degrade, or fail-fast) before full extraction cutover.
+
 ---
 
 ## Part 2: Multi-Vehicle Type Support Enhancement
