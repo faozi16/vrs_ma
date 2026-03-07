@@ -534,6 +534,40 @@ This section records the first extraction-compatible boundary switch for Catalog
 - Introduce resilience policies (timeouts/retries/circuit breaker) around remote facade calls.
 - Add contract tests for `CatalogReadFacade` local vs remote parity.
 
+### 1.10 Phase 5 Remote Read Hardening (Executed: 2026-03-07)
+
+This section records reliability and parity work for remote Catalog facade mode.
+
+#### Phase 5 Objective
+- Harden `CatalogReadFacade` remote mode with baseline resilience settings.
+- Add contract-style tests to validate local vs remote facade behavior parity at the boundary level.
+
+#### Completed Activities
+- Added remote facade resilience controls:
+    - connect timeout
+    - read timeout
+    - bounded retry attempts
+    - retry backoff delay
+- Added remote profile config for extraction testing:
+    - `application-remote.properties`
+    - activates `app.catalog.read.mode=remote`
+- Added facade contract-style unit tests:
+    - `CatalogReadFacadeAdapterTest` (local adapter behavior)
+    - `RemoteCatalogReadFacadeAdapterTest` (remote mapping + retry/failure behavior)
+
+#### Baseline Compatibility Check
+- Default runtime mode remains `local` and backward-compatible.
+- Remote mode reliability behavior is now configuration-driven.
+- Existing API contracts remain unchanged.
+
+#### Artifacts
+- Phase 5 implementation notes: `docs/migration/phase5-remote-read-hardening.md`
+
+#### Entry Criteria For Phase 6
+- Start running an independent Catalog process for integrated remote-mode validation.
+- Add observability metrics for remote call latency/failure counts.
+- Introduce fallback strategy and/or circuit breaker once service split traffic increases.
+
 ---
 
 ## Part 2: Multi-Vehicle Type Support Enhancement
