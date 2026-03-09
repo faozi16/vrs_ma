@@ -646,6 +646,41 @@ This section records extraction-readiness validation for remote catalog mode in 
 - Start decomposing write paths for Catalog ownership boundary.
 - Introduce contract testing against extracted Catalog deployment pipeline.
 
+### 1.13 Phase 8 Cutover Readiness Gates (Executed: 2026-03-09)
+
+This section captures first-pass implementation of operational cutover gates using remote facade metrics.
+
+#### Phase 8 Objective
+- Translate observability signals into concrete go/no-go cutover checks.
+- Provide explicit rollback signal when cutover SLOs are breached.
+
+#### Completed Activities
+- Added configurable cutover gate properties (`app.catalog.cutover.gates.*`).
+- Added health indicator `catalogCutoverReadiness` in remote mode.
+- Implemented gate evaluation against existing metric series:
+    - success ratio
+    - failure ratio
+    - p95 latency
+    - circuit-open count
+    - fallback-hit count
+- Added machine-readable rollback decision fields:
+    - `breaches`
+    - `rollbackSuggested`
+- Added tests for gate status behavior (`UNKNOWN`/`UP`/`DOWN`).
+
+#### Baseline Compatibility Check
+- Local default mode remains unchanged.
+- Cutover readiness indicator is active only in remote mode.
+- Existing API contracts remain unchanged.
+
+#### Artifacts
+- Phase 8 implementation notes: `docs/migration/phase8-cutover-readiness-gates.md`
+
+#### Entry Criteria For Phase 9
+- Decompose Catalog write ownership from shared persistence in reservation path.
+- Add contract-test suite that runs against extracted Catalog deployment in CI.
+- Integrate cutover gate status into deployment promotion checks.
+
 ---
 
 ## Part 2: Multi-Vehicle Type Support Enhancement
