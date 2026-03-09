@@ -1,0 +1,33 @@
+groups:
+  - name: catalog-remote-observability
+    rules:
+      - alert: CatalogRemoteFailureRatioHigh
+        expr: |
+          sum(rate(catalog_facade_remote_calls_total{result="failure"}[5m]))
+          /
+          clamp_min(sum(rate(catalog_facade_remote_calls_total{result=~"success|failure|empty"}[5m])), 0.001)
+          > 0.20
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High remote catalog failure ratio"
+          description: "Remote catalog failure ratio has stayed above 20% for 5 minutes."
+
+      - alert: CatalogRemoteCircuitOpenedFrequently
+        expr: increase(catalog_facade_remote_circuit_total{state="opened"}[10m]) >= 3
+        for: 0m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Catalog circuit opens repeatedly"
+          description: "Circuit opened at least 3 times within 10 minutes."
+
+      - alert: CatalogRemoteFallbackSpike
+        expr: increase(catalog_facade_remote_fallback_total{result="hit"}[10m]) >= 10
+        for: 0m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Catalog fallback usage spike"
+          description: "Fallback hit count reached 10 or more in the last 10 minutes."

@@ -25,9 +25,9 @@ public class Reservation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long reservationId;
-    @Column(name = "customer_id", insertable = false, updatable = false)
+    @Column(name = "customer_id")
     private Long customerId;
-    @Column(name = "vehicle_id", insertable = false, updatable = false)
+    @Column(name = "vehicle_id")
     private Long vehicleId;
     private OffsetDateTime pickupTime;
     private String pickupLocation;

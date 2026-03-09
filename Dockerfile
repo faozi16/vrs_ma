@@ -26,7 +26,7 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y curl && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Copy the built JAR from builder stage
-COPY --from=builder /app/build/libs/carrsvt-0.0.1-SNAPSHOT.jar app.jar
+COPY --from=builder /app/build/libs/vrs-0.0.1-SNAPSHOT.jar app.jar
 
 # Expose port
 EXPOSE 8080

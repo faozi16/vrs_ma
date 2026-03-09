@@ -1,0 +1,124 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: vrs-mysql-phase7
+    environment:
+      MYSQL_ROOT_PASSWORD: verysecret
+      MYSQL_DATABASE: car_rsvt
+      MYSQL_USER: theuser
+      MYSQL_PASSWORD: thepassword
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data_phase7:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "theuser", "-pthepassword"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - vrs-phase7-network
+
+  catalog-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: vrs-catalog-service
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      SERVER_PORT: 8002
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/car_rsvt
+      SPRING_DATASOURCE_USERNAME: theuser
+      SPRING_DATASOURCE_PASSWORD: thepassword
+      SPRING_DATASOURCE_DRIVER_CLASS_NAME: com.mysql.cj.jdbc.Driver
+      SPRING_JPA_SHOW_SQL: "true"
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      APP_CATALOG_READ_MODE: local
+    ports:
+      - "8002:8002"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8002/actuator/health"]
+      interval: 20s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+    networks:
+      - vrs-phase7-network
+
+  reservation-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: vrs-reservation-service
+    depends_on:
+      mysql:
+        condition: service_healthy
+      catalog-service:
+        condition: service_healthy
+    environment:
+      SERVER_PORT: 8080
+      SPRING_PROFILES_ACTIVE: remote
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/car_rsvt
+      SPRING_DATASOURCE_USERNAME: theuser
+      SPRING_DATASOURCE_PASSWORD: thepassword
+      SPRING_DATASOURCE_DRIVER_CLASS_NAME: com.mysql.cj.jdbc.Driver
+      SPRING_JPA_SHOW_SQL: "true"
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      APP_CATALOG_REMOTE_BASE_URL: http://catalog-service:8002
+      APP_CATALOG_REMOTE_FALLBACK_TO_LOCAL: "false"
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 20s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+    networks:
+      - vrs-phase7-network
+
+  prometheus:
+    image: prom/prometheus:v2.54.1
+    container_name: vrs-prometheus
+    depends_on:
+      reservation-service:
+        condition: service_healthy
+      catalog-service:
+        condition: service_healthy
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+    volumes:
+      - ./ops/observability/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./ops/observability/prometheus/alerts/catalog-remote-alerts.yml:/etc/prometheus/alerts/catalog-remote-alerts.yml:ro
+    ports:
+      - "9090:9090"
+    networks:
+      - vrs-phase7-network
+
+  grafana:
+    image: grafana/grafana:11.2.0
+    container_name: vrs-grafana
+    depends_on:
+      - prometheus
+    ports:
+      - "3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+    volumes:
+      - ./ops/observability/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources:ro
+      - ./ops/observability/grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ./ops/observability/grafana/dashboards:/var/lib/grafana/dashboards:ro
+    networks:
+      - vrs-phase7-network
+
+volumes:
+  mysql_data_phase7:
+    driver: local
+
+networks:
+  vrs-phase7-network:
+    driver: bridge

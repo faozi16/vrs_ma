@@ -7,6 +7,8 @@ import org.springframework.stereotype.Service;
 
 import com.af.vrs.entity.Reservation;
 import com.af.vrs.reservation.application.ReservationApplicationService;
+import com.af.vrs.reservation.application.ReferenceValidationResult;
+import com.af.vrs.reservation.application.ReservationCrossDomainService;
 import com.af.vrs.repository.ReservationRepository;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -16,7 +18,24 @@ public class ReservationService implements ReservationApplicationService {
     @Autowired
     private ReservationRepository reservationRepository;
 
+    @Autowired
+    private ReservationCrossDomainService reservationCrossDomainService;
+
     public Reservation saveReservation(Reservation reservation) {
+        ReferenceValidationResult validation = reservationCrossDomainService.validateReservationReferences(
+                reservation.getCustomerId(),
+                reservation.getVehicleId());
+
+        if (!validation.customerExists()) {
+            throw new EntityNotFoundException("Customer not found");
+        }
+        if (!validation.vehicleExists()) {
+            throw new EntityNotFoundException("Vehicle not found");
+        }
+        if (!validation.vehicleAvailable()) {
+            throw new IllegalStateException("Vehicle is not available");
+        }
+
         return reservationRepository.save(reservation);
     }
 

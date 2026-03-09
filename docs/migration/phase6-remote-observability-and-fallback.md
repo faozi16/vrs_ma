@@ -50,3 +50,10 @@ Included in both `application.properties` and `application-remote.properties`.
 - No API/controller contract changes.
 - Default local mode unchanged.
 - Remote mode behavior is now safer and more observable.
+
+## 7. Handoff To Phase 7
+
+Phase 6 entry criteria have been executed in Phase 7 with:
+- process-separated Catalog/Reservation runtime validation
+- dashboard + alert baseline for remote metrics
+- explicit fail-fast fallback policy in extraction-validation environment

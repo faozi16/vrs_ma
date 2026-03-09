@@ -5,6 +5,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
@@ -32,6 +33,7 @@ public class RemoteCatalogReadFacadeAdapter implements CatalogReadFacade {
     private final AtomicInteger consecutiveFailures = new AtomicInteger(0);
     private final AtomicLong circuitOpenUntilEpochMs = new AtomicLong(0L);
 
+    @Autowired
     public RemoteCatalogReadFacadeAdapter(RestClient.Builder builder,
             @Value("${app.catalog.remote.base-url}") String catalogBaseUrl,
             @Value("${app.catalog.remote.connect-timeout-ms:2000}") int connectTimeoutMs,

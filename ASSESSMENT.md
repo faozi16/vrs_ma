@@ -608,6 +608,44 @@ This section records operational hardening for remote Catalog reads during extra
 - Add dashboarding/alerts on new metric series.
 - Decide long-term fallback policy (keep, degrade, or fail-fast) before full extraction cutover.
 
+### 1.12 Phase 7 Remote Integration and Operability Validation (Executed: 2026-03-08)
+
+This section records extraction-readiness validation for remote catalog mode in a process-separated runtime topology.
+
+#### Phase 7 Objective
+- Validate remote facade behavior with independently running Catalog and Reservation processes.
+- Introduce baseline monitoring and alerting around Phase 6 metrics.
+- Make explicit fallback policy decision for extraction validation runtime.
+
+#### Completed Activities
+- Added extraction-validation compose stack:
+    - `compose.phase7-remote.yaml`
+    - process-separated `catalog-service` and `reservation-service`
+    - `prometheus` and `grafana` for runtime observability
+- Added observability plumbing in application runtime:
+    - `spring-boot-starter-actuator`
+    - `micrometer-registry-prometheus`
+    - `/actuator/prometheus` exposure and latency histogram for remote facade timer
+- Added alert and dashboard assets:
+    - Prometheus scrape and alert rule files
+    - Grafana datasource/dashboard provisioning and baseline dashboard
+- Finalized extraction-validation fallback policy:
+    - `APP_CATALOG_REMOTE_FALLBACK_TO_LOCAL=false` (fail-fast)
+    - keep fallback capability in code for controlled rollback/feature-flag scenarios
+
+#### Baseline Compatibility Check
+- Default local app mode remains unchanged.
+- Remote mode behavior remains configuration-driven.
+- Controller/API contracts remain unchanged.
+
+#### Artifacts
+- Phase 7 implementation notes: `docs/migration/phase7-remote-integration-and-operability.md`
+
+#### Entry Criteria For Phase 8
+- Define and implement cutover readiness gates (SLO thresholds, rollback triggers).
+- Start decomposing write paths for Catalog ownership boundary.
+- Introduce contract testing against extracted Catalog deployment pipeline.
+
 ---
 
 ## Part 2: Multi-Vehicle Type Support Enhancement
