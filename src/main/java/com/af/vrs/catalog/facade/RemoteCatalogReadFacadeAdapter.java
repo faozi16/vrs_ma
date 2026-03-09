@@ -25,6 +25,7 @@ public class RemoteCatalogReadFacadeAdapter implements CatalogReadFacade {
     private final RestClient restClient;
     private final int maxAttempts;
     private final long backoffMillis;
+    private final String vehicleByIdPath;
     private final int circuitFailureThreshold;
     private final long circuitOpenMillis;
     private final boolean fallbackToLocal;
@@ -40,6 +41,7 @@ public class RemoteCatalogReadFacadeAdapter implements CatalogReadFacade {
             @Value("${app.catalog.remote.read-timeout-ms:3000}") int readTimeoutMs,
             @Value("${app.catalog.remote.max-attempts:2}") int maxAttempts,
             @Value("${app.catalog.remote.retry-backoff-ms:100}") long backoffMillis,
+            @Value("${app.catalog.remote.vehicle-by-id-path:/api/vehicles/{id}}") String vehicleByIdPath,
             @Value("${app.catalog.remote.circuit.failure-threshold:3}") int circuitFailureThreshold,
             @Value("${app.catalog.remote.circuit.open-ms:5000}") long circuitOpenMillis,
             @Value("${app.catalog.remote.fallback-to-local:true}") boolean fallbackToLocal,
@@ -55,6 +57,7 @@ public class RemoteCatalogReadFacadeAdapter implements CatalogReadFacade {
                 .build();
         this.maxAttempts = Math.max(1, maxAttempts);
         this.backoffMillis = Math.max(0L, backoffMillis);
+        this.vehicleByIdPath = vehicleByIdPath;
         this.circuitFailureThreshold = Math.max(1, circuitFailureThreshold);
         this.circuitOpenMillis = Math.max(1L, circuitOpenMillis);
         this.fallbackToLocal = fallbackToLocal;
@@ -63,13 +66,14 @@ public class RemoteCatalogReadFacadeAdapter implements CatalogReadFacade {
     }
 
     RemoteCatalogReadFacadeAdapter(RestClient restClient, int maxAttempts, long backoffMillis) {
-        this(restClient, maxAttempts, backoffMillis, 3, 5000L, true, null, null);
+        this(restClient, maxAttempts, backoffMillis, "/api/vehicles/{id}", 3, 5000L, true, null, null);
     }
 
     RemoteCatalogReadFacadeAdapter(
             RestClient restClient,
             int maxAttempts,
             long backoffMillis,
+            String vehicleByIdPath,
             int circuitFailureThreshold,
             long circuitOpenMillis,
             boolean fallbackToLocal,
@@ -78,6 +82,7 @@ public class RemoteCatalogReadFacadeAdapter implements CatalogReadFacade {
         this.restClient = restClient;
         this.maxAttempts = Math.max(1, maxAttempts);
         this.backoffMillis = Math.max(0L, backoffMillis);
+        this.vehicleByIdPath = vehicleByIdPath;
         this.circuitFailureThreshold = Math.max(1, circuitFailureThreshold);
         this.circuitOpenMillis = Math.max(1L, circuitOpenMillis);
         this.fallbackToLocal = fallbackToLocal;
@@ -96,7 +101,7 @@ public class RemoteCatalogReadFacadeAdapter implements CatalogReadFacade {
         for (int attempt = 1; attempt <= maxAttempts; attempt++) {
             try {
                 CatalogVehicleResponse response = restClient.get()
-                        .uri("/api/vehicles/{id}", vehicleId)
+                    .uri(vehicleByIdPath, vehicleId)
                         .retrieve()
                         .body(CatalogVehicleResponse.class);
 

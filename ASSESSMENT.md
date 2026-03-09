@@ -681,6 +681,39 @@ This section captures first-pass implementation of operational cutover gates usi
 - Add contract-test suite that runs against extracted Catalog deployment in CI.
 - Integrate cutover gate status into deployment promotion checks.
 
+### 1.14 Phase 9 Service Auth Bridge and Cutover Stabilization (Executed: 2026-03-09)
+
+This section records stabilization work to remove remote read auth mismatch during extraction runtime.
+
+#### Phase 9 Objective
+- Restore successful Reservation -> Catalog remote reads under process-separated runtime.
+- Confirm cutover gate can move from degraded to healthy when remote path is functional.
+
+#### Completed Activities
+- Added internal Catalog read endpoint:
+    - `GET /api/vehicles/internal/catalog/{id}`
+- Added security allowlist for internal route.
+- Added configurable remote adapter path:
+    - `app.catalog.remote.vehicle-by-id-path`
+- Set extraction runtime path in compose and remote profile to internal route.
+- Revalidated runtime behavior:
+    - reservation create calls returned `200`
+    - remote call metrics shifted to `success`
+    - `catalogCutoverReadiness` evaluated `UP` with no breaches
+
+#### Baseline Compatibility Check
+- Public API contract remains unchanged.
+- Default local mode remains unchanged.
+- Internal route is used only when explicitly configured.
+
+#### Artifacts
+- Phase 9 implementation notes: `docs/migration/phase9-service-auth-bridge-and-cutover-stabilization.md`
+
+#### Entry Criteria For Phase 10
+- Replace internal-route trust model with explicit service identity (mTLS or signed service token).
+- Add CI contract tests for internal and public Catalog read routes.
+- Wire cutover gate status into deployment promotion automation.
+
 ---
 
 ## Part 2: Multi-Vehicle Type Support Enhancement

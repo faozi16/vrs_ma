@@ -36,7 +36,8 @@ class RemoteCatalogReadFacadeAdapterTest {
                 .baseUrl("http://localhost:18002")
                 .build();
 
-        RemoteCatalogReadFacadeAdapter adapter = new RemoteCatalogReadFacadeAdapter(restClient, 1, 0);
+        RemoteCatalogReadFacadeAdapter adapter = new RemoteCatalogReadFacadeAdapter(restClient, 1, 0,
+                "/api/vehicles/{id}", 3, 5000L, true, null, new SimpleMeterRegistry());
 
         Optional<VehicleSummary> result = adapter.findVehicle(7L);
 
@@ -60,7 +61,8 @@ class RemoteCatalogReadFacadeAdapterTest {
                 .baseUrl("http://localhost:18002")
                 .build();
 
-        RemoteCatalogReadFacadeAdapter adapter = new RemoteCatalogReadFacadeAdapter(restClient, 2, 0);
+        RemoteCatalogReadFacadeAdapter adapter = new RemoteCatalogReadFacadeAdapter(restClient, 2, 0,
+                "/api/vehicles/{id}", 3, 5000L, true, null, new SimpleMeterRegistry());
 
         Optional<VehicleSummary> result = adapter.findVehicle(9L);
 
@@ -88,6 +90,7 @@ class RemoteCatalogReadFacadeAdapterTest {
                                 restClient,
                                 1,
                                 0,
+                                "/api/vehicles/{id}",
                                 1,
                                 60000,
                                 true,

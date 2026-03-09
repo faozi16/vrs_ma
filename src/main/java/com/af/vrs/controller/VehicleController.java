@@ -48,6 +48,12 @@ public class VehicleController {
         return ResponseEntity.ok(vehicleMapper.vehicleToVehicleDto(v));
     }
 
+    @GetMapping("/internal/catalog/{id}")
+    public ResponseEntity<VehicleDto> getVehicleByIdInternal(@PathVariable Long id) {
+        Vehicle v = vehicleService.getVehicleById(id);
+        return ResponseEntity.ok(vehicleMapper.vehicleToVehicleDto(v));
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<VehicleDto> updateVehicle(@PathVariable Long id, @jakarta.validation.Valid @RequestBody VehicleDto vehicleDetails) {
         Vehicle entity = vehicleMapper.vehicleDtoToVehicle(vehicleDetails);
